@@ -1,0 +1,41 @@
+// ════════════════════════════════════════════════════════════════════════
+// FBSFB — Gridiron Crimson theme layer for Flarum 2
+//
+// The palette comes from Bespoke's "gridiron" preset (crimson brand,
+// near-black → crimson hero header, warm neutrals). This file adds only what
+// the token compiler can't: normalized tag icons and a little polish. Every
+// color reads Bespoke's emitted tokens with literal Gridiron fallbacks, so it
+// still renders sanely if Bespoke is disabled.
+// ════════════════════════════════════════════════════════════════════════
+
+// ─── Token bridge: --fbsfb-* aliases over Bespoke's variables ────────────
+:root {
+  --fbsfb-crimson:     var(--bespoke-color-brand, #9e1b32);
+  --fbsfb-crimson-ink: var(--bespoke-color-heroFrom, #120a0c);
+}
+[data-theme^="dark"] {
+  --fbsfb-crimson: var(--bespoke-color-brand, #d62839);
+}
+
+// ─── Tag icons ───────────────────────────────────────────────────────────
+// The custom fa-kit team logos render as `svg-inline--fa` at their native
+// aspect ratio, so wide wordmarks (e.g. fa-pac-12-wordmark, fa-usc-text-logo)
+// blow past the 16px tag-icon box and look oversized next to the square glyph
+// icons. Force every tag icon — in the widget, tag list, labels and the /tags
+// page — to a uniform square that scales with its context's font-size.
+svg.TagIcon.svg-inline--fa,
+.TagLabel svg.svg-inline--fa,
+.TagsPage svg.TagIcon.svg-inline--fa,
+.item-tag svg.svg-inline--fa {
+  width: 1em !important;
+  height: 1em !important;
+  max-width: 1em !important;
+  vertical-align: -0.125em;
+}
+
+// ─── Small polish ────────────────────────────────────────────────────────
+// Keep tag labels vertically centered against their (now uniform) icons.
+.TagsPage .TagTile,
+.item-tag .TagLabel {
+  vertical-align: middle;
+}

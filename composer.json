@@ -1,0 +1,45 @@
+{
+  "name": "ernestdefoe/fbsfb-theme",
+  "description": "FBSFB — college-football Gridiron Crimson theme for Flarum 2, built on ernestdefoe/bespoke: crimson brand, dark→crimson hero header, and normalized tag icons (uniform sizing for the custom fa-kit team logos). Pairs with Bespoke's gridiron preset.",
+  "keywords": [
+    "flarum",
+    "flarum-extension",
+    "theme",
+    "crimson",
+    "football",
+    "gridiron",
+    "college-football"
+  ],
+  "type": "flarum-extension",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "ernestdefoe",
+      "email": "ernestdefoe@gmail.com"
+    }
+  ],
+  "homepage": "https://github.com/ernestdefoe/fbsfb-theme",
+  "require": {
+    "flarum/core": "^2.0",
+    "ernestdefoe/bespoke": "*@dev"
+  },
+  "extra": {
+    "flarum-extension": {
+      "title": "FBSFB — Gridiron Crimson Theme",
+      "category": "theme",
+      "icon": {
+        "name": "fa-solid fa-football",
+        "backgroundColor": "#9e1b32",
+        "color": "#ffffff"
+      }
+    },
+    "flarum-cli": {
+      "modules": {
+        "css": true,
+        "locale": true
+      }
+    }
+  },
+  "minimum-stability": "beta",
+  "prefer-stable": true
+}

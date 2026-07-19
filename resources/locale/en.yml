@@ -1,0 +1,6 @@
+ernestdefoe-fbsfb-theme:
+  admin:
+    # Reserved for future admin-facing strings. The theme is CSS-only today;
+    # the crimson palette lives in Bespoke's "gridiron" preset.
+    settings:
+      title: FBSFB — Gridiron Crimson Theme
