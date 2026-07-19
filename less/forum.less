@@ -40,13 +40,21 @@ svg.TagIcon.svg-inline--fa,
 // overflow:visible — so they spill past the slot and sit on top of the tag
 // name. Pin the widget icon to a fixed square that OWNS its flex space, and
 // keep the name to a single ellipsized line clear of it.
+// The widget renders tags as CHIPS by default (`.Bespoke-tagChip > i.icon`) and
+// optionally as list rows (`.Bespoke-tagRow > .Bespoke-tagRowIcon`). FontAwesome
+// swaps each <i> for a native-aspect <svg>; wide wordmark logos then eat the
+// chip's width and spill over the name. Pin EVERY tag-widget icon to a fixed
+// square — this both stops the overlap AND frees the horizontal room the wide
+// icon was stealing, so long conference names stop wrapping.
+.Bespoke-tagChip > i,
+.Bespoke-tagChip > svg.svg-inline--fa,
 .Bespoke-tagRow > .Bespoke-tagRowIcon,
 .Bespoke-tagRow > svg.Bespoke-tagRowIcon {
-  flex: 0 0 1.2em !important;
-  width: 1.2em !important;
-  height: 1.2em !important;
-  min-width: 1.2em !important;
-  max-width: 1.2em !important;
+  flex: 0 0 1.15em !important;
+  width: 1.15em !important;
+  height: 1.15em !important;
+  min-width: 1.15em !important;
+  max-width: 1.15em !important;
   overflow: hidden;
 }
 .Bespoke-tagRow > .Bespoke-tagRowName {
