@@ -33,6 +33,37 @@ svg.TagIcon.svg-inline--fa,
   vertical-align: -0.125em;
 }
 
+// ─── "Popular Tags" widget (Bespoke tags-list) ───────────────────────────
+// Each row is `.Bespoke-tagRow` = [i.Bespoke-tagRowIcon][span.Bespoke-tagRowName]
+// [span.Bespoke-tagRowCount]. Bespoke reserves a 14px icon slot, but the custom
+// fa-kit team-logo SVGs render at their native (wide) aspect ratio with
+// overflow:visible — so they spill past the slot and sit on top of the tag
+// name. Pin the widget icon to a fixed square that OWNS its flex space, and
+// keep the name to a single ellipsized line clear of it.
+.Bespoke-tagRow > .Bespoke-tagRowIcon,
+.Bespoke-tagRow > svg.Bespoke-tagRowIcon {
+  flex: 0 0 1.2em !important;
+  width: 1.2em !important;
+  height: 1.2em !important;
+  min-width: 1.2em !important;
+  max-width: 1.2em !important;
+  overflow: hidden;
+}
+.Bespoke-tagRow > .Bespoke-tagRowName {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// ─── Wider sidebar so conference names fit on one line ────────────────────
+@media (min-width: 768px) {
+  .IndexPage .Page-sidebar {
+    width: 260px !important;
+    flex-basis: 260px !important;
+    max-width: 260px !important;
+  }
+}
+
 // ─── Small polish ────────────────────────────────────────────────────────
 // Keep tag labels vertically centered against their (now uniform) icons.
 .TagsPage .TagTile,
