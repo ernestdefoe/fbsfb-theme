@@ -1,0 +1,133 @@
+# Backend tests and PHPStan for a PRIVATE extension, which pays for Actions
+# minutes. It runs the same steps as flarum/framework's REUSABLE_backend.yml
+# (composer test:setup, composer test, composer analyse:phpstan) on a fixed
+# small matrix.
+#
+# Why not REUSABLE_backend with a shorter db_versions? Its matrix labels each
+# database with `include:` entries, and an include that matches no existing
+# job is added as a job of its own. Every database left out of db_versions
+# comes back as a job with no PHP version. Public repos use the reusable
+# workflow and its full matrix, which is free.
+#
+# Coverage: the oldest and newest PHP, MySQL and MariaDB (what Ernest's forums
+# run), and PostgreSQL and SQLite, each prefixed at the longest table prefix
+# its driver allows.
+
+name: "FBSFB Theme PHP"
+
+on: [workflow_dispatch, push, pull_request]
+
+env:
+  COMPOSER_ROOT_VERSION: dev-main
+  # Private dependencies (ai-helper, bespoke, parley-calls, …) install from
+  # GitHub with the token in this secret. Empty when a repo doesn't need it.
+  COMPOSER_AUTH: ${{ secrets.COMPOSER_AUTH }}
+  FLARUM_TEST_TMP_DIR_LOCAL: tests/integration/tmp
+  DB_DATABASE: flarum_test
+  DB_USERNAME: flarum
+  DB_PASSWORD: password
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { php: '8.3', service: 'mysql:8.4', db: 'MySQL 8.4', driver: mysql, prefix: '' }
+          - { php: '8.5', service: 'mariadb:11.8', db: 'MariaDB 11.8', driver: mariadb, prefix: 'flarum_c_', prefixStr: '(prefix)' }
+          - { php: '8.5', service: 'postgres:18', db: 'PostgreSQL 18', driver: pgsql, prefix: 'flarum_p', prefixStr: '(prefix)' }
+          - { php: '8.5', service: 'sqlite:3', db: 'SQLite', driver: sqlite, prefix: 'flarum_c_', prefixStr: '(prefix)' }
+
+    name: "PHP ${{ matrix.php }} / ${{ matrix.db }} ${{ matrix.prefixStr }}"
+
+    services:
+      mysql:
+        image: ${{ matrix.driver == 'mysql' && matrix.service || '' }}
+        env:
+          MYSQL_DATABASE: ${{ env.DB_DATABASE }}
+          MYSQL_USER: ${{ env.DB_USERNAME }}
+          MYSQL_PASSWORD: ${{ env.DB_PASSWORD }}
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=10
+      mariadb:
+        image: ${{ matrix.driver == 'mariadb' && matrix.service || '' }}
+        env:
+          MARIADB_DATABASE: ${{ env.DB_DATABASE }}
+          MARIADB_USER: ${{ env.DB_USERNAME }}
+          MARIADB_PASSWORD: ${{ env.DB_PASSWORD }}
+          MARIADB_ROOT_PASSWORD: root
+        ports:
+          - 3306
+        options: --health-cmd="healthcheck.sh --connect" --health-interval=10s --health-timeout=5s --health-retries=10
+      postgres:
+        image: ${{ matrix.driver == 'pgsql' && matrix.service || '' }}
+        env:
+          POSTGRES_DB: ${{ env.DB_DATABASE }}
+          POSTGRES_USER: ${{ env.DB_USERNAME }}
+          POSTGRES_PASSWORD: ${{ env.DB_PASSWORD }}
+        ports:
+          - 5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          extensions: curl, dom, gd, json, mbstring, openssl, pdo_mysql, tokenizer, zip
+          tools: composer:v2
+
+      - name: Install Composer dependencies
+        run: composer install
+
+      - name: Run tests
+        run: |
+          composer test:setup
+          composer test
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: ${{ (matrix.driver == 'mysql' && job.services.mysql.ports['3306']) || (matrix.driver == 'mariadb' && job.services.mariadb.ports['3306']) || (matrix.driver == 'pgsql' && job.services.postgres.ports['5432']) }}
+          DB_PREFIX: ${{ matrix.prefix }}
+          DB_DRIVER: ${{ matrix.driver }}
+          COMPOSER_PROCESS_TIMEOUT: 600
+
+  phpstan:
+    runs-on: ubuntu-latest
+    name: PHPStan PHP 8.3
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+          extensions: curl, dom, gd, json, mbstring, openssl, pdo_mysql, tokenizer, zip
+          tools: composer:v2
+
+      - name: Install Composer dependencies
+        run: composer install
+
+      - name: Create MySQL database
+        run: |
+          sudo systemctl start mysql
+          mysql -uroot -proot -e 'CREATE DATABASE flarum_test;' --port 3306
+
+      - name: Run PHPStan
+        run: composer analyse:phpstan
+        env:
+          DB_USERNAME: root
+          DB_PORT: 3306
+          DB_PASSWORD: root
+          COMPOSER_PROCESS_TIMEOUT: 600
+          FLARUM_TEST_TMP_DIR_LOCAL: ./tmp
