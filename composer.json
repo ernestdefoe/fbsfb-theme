@@ -19,9 +19,15 @@
     }
   ],
   "homepage": "https://github.com/ernestdefoe/fbsfb-theme",
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/ernestdefoe/bespoke"
+    }
+  ],
   "require": {
     "flarum/core": "^2.0",
-    "ernestdefoe/bespoke": "*@dev"
+    "ernestdefoe/bespoke": "^2.0"
   },
   "extra": {
     "flarum-extension": {
