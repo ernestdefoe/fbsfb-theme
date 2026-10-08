@@ -29,6 +29,16 @@
     "flarum/core": "^2.0",
     "ernestdefoe/bespoke": "^2.0"
   },
+  "autoload-dev": {
+    "psr-4": {
+      "ErnestDefoe\\FbsfbTheme\\Tests\\": "tests/"
+    }
+  },
+  "require-dev": {
+    "flarum/phpstan": "^2.0",
+    "flarum/testing": "^2.0",
+    "laravel/pint": "^1.32"
+  },
   "extra": {
     "flarum-extension": {
       "title": "FBSFB — Gridiron Crimson Theme",
@@ -45,6 +55,24 @@
         "locale": true
       }
     }
+  },
+  "scripts": {
+    "test": [
+      "@test:integration"
+    ],
+    "test:integration": "phpunit -c tests/phpunit.integration.xml",
+    "test:setup": "@php tests/integration/setup.php",
+    "analyse:phpstan": "phpstan analyse",
+    "style": "pint --test",
+    "style:fix": "pint"
+  },
+  "scripts-descriptions": {
+    "test": "Runs all tests.",
+    "test:integration": "Runs all integration tests.",
+    "test:setup": "Sets up a database for use with integration tests. Execute this only once.",
+    "analyse:phpstan": "Run static analysis",
+    "style": "Checks the code style",
+    "style:fix": "Fixes the code style"
   },
   "minimum-stability": "beta",
   "prefer-stable": true
